@@ -8,19 +8,19 @@
       <button @click="clearNumbers" class="rounded text-3xl h-16 w-16 border border-black bg-gray-300 hover:bg-gray-400">C</button>
       <button @click="convertNumberType" class="rounded text-3xl h-16 w-16 border border-black bg-gray-300 hover:bg-gray-400">+/-</button>
       <button @click="percentageNumbers" class="rounded text-3xl h-16 w-16 border border-black bg-gray-300 hover:bg-gray-400">%</button>
-      <button @click="divideNumbers" :class="[ isActive === 'divide' ? 'bg-green-400' : 'bg-green-300' ]" class="rounded text-3xl h-16 w-16 border border-black bg-green-300 hover:bg-green-400">÷</button>
+      <button @click="operateNumbers('division', 'divide')" :class="[ isActive === 'divide' ? 'bg-green-400' : 'bg-green-300' ]" class="rounded text-3xl h-16 w-16 border border-black bg-green-300 hover:bg-green-400">÷</button>
       <button @click="concatNumbers('7')" class="rounded text-3xl h-16 w-16 border border-black hover:bg-gray-100">7</button>
       <button @click="concatNumbers('8')" class="rounded text-3xl h-16 w-16 border border-black hover:bg-gray-100">8</button>
       <button @click="concatNumbers('9')" class="rounded text-3xl h-16 w-16 border border-black hover:bg-gray-100">9</button>
-      <button @click="multiplyNumbers" :class="[ isActive === 'multiply' ? 'bg-green-400' : 'bg-green-300' ]" class="rounded text-3xl h-16 w-16 border border-black hover:bg-green-400">×</button>
+      <button @click="operateNumbers('multiplication', 'multiply')" :class="[ isActive === 'multiply' ? 'bg-green-400' : 'bg-green-300' ]" class="rounded text-3xl h-16 w-16 border border-black hover:bg-green-400">×</button>
       <button @click="concatNumbers('4')" class="rounded text-3xl h-16 w-16 border border-black hover:bg-gray-100">4</button>
       <button @click="concatNumbers('5')" class="rounded text-3xl h-16 w-16 border border-black hover:bg-gray-100">5</button>
       <button @click="concatNumbers('6')" class="rounded text-3xl h-16 w-16 border border-black hover:bg-gray-100">6</button>
-      <button @click="subtractNumbers" :class="[ isActive === 'subtract' ? 'bg-green-400' : 'bg-green-300' ]" class="rounded text-3xl h-16 w-16 border border-black hover:bg-green-400">-</button>
+      <button @click="operateNumbers('subtraction', 'subtract')" :class="[ isActive === 'subtract' ? 'bg-green-400' : 'bg-green-300' ]" class="rounded text-3xl h-16 w-16 border border-black hover:bg-green-400">-</button>
       <button @click="concatNumbers('1')" class="rounded text-3xl h-16 w-16 border border-black hover:bg-gray-100">1</button>
       <button @click="concatNumbers('2')" class="rounded text-3xl h-16 w-16 border border-black hover:bg-gray-100">2</button>
       <button @click="concatNumbers('3')" class="rounded text-3xl h-16 w-16 border border-black hover:bg-gray-100">3</button>
-      <button @click="addNumbers" :class="[ isActive === 'add' ? 'bg-green-400' : 'bg-green-300' ]" class="rounded text-3xl h-16 w-16 border border-black hover:bg-green-400">+</button>
+      <button @click="operateNumbers('addition', 'add')" :class="[ isActive === 'add' ? 'bg-green-400' : 'bg-green-300' ]" class="rounded text-3xl h-16 w-16 border border-black hover:bg-green-400">+</button>
       <button @click="concatNumbers('0')" class="rounded text-3xl h-16 w-33 border border-black hover:bg-gray-100 col-span-2">0</button>
       <button @click="concatNumbers('.')" class="rounded text-3xl h-16 w-16 border border-black hover:bg-gray-100">·</button>
       <button @click="getTotalNumbers" class="rounded text-3xl h-16 w-16 border border-black bg-green-300 hover:bg-green-400">=</button>
@@ -38,6 +38,12 @@ export default {
       secondNum: 0,
       isActive: '',
       currentMethod: '',
+      operators: {
+        addition: '+',
+        subtraction: '-',
+        multiplication: '*',
+        division: '/'
+      },
       equalCount: 0
     }
   },
@@ -48,6 +54,7 @@ export default {
   },
   methods: {
     concatNumbers(num) {
+      // console.log(this.operators[this.currentMethod])
       this.equalCount = 0
       if (this.isActive) {
         this.isActive = ''
@@ -106,152 +113,30 @@ export default {
     percentageNumbers () {
       this.total = this.total / 100
     },
-    addNumbers() {
-      this.isActive = 'add'
+    operateNumbers(method, isActive) {
+      this.isActive = isActive
 
       if (this.equalCount !== 0) {
         this.equalCount = 0
         this.currentMethod = ''
       }
 
-      if (this.currentMethod === 'addition') {
-        this.firstNum = parseFloat(this.firstNum) + parseFloat(this.total)
+      if (this.currentMethod === method) {
+        this.firstNum = eval(`${this.firstNum} ${this.operators[this.currentMethod]} ${this.total}`)
         this.total = this.firstNum
       }
 
-      if (this.currentMethod === 'subtraction') {
-        this.currentMethod = 'addition'
-        this.firstNum = parseFloat(this.firstNum) - parseFloat(this.total)
+      if (this.currentMethod !== method && this.currentMethod !== '') {
+        this.firstNum = eval(`${this.firstNum} ${this.operators[this.currentMethod]} ${this.total}`)
         this.total = this.firstNum
-      }
-
-      if (this.currentMethod === 'multiplication') {
-        this.currentMethod = 'addition'
-        this.firstNum = parseFloat(this.firstNum) * parseFloat(this.total)
-        this.total = this.firstNum
-      }
-
-      if (this.currentMethod === 'division') {
-        this.currentMethod = 'addition'
-        this.firstNum = parseFloat(this.firstNum) / parseFloat(this.total)
-        this.total = this.firstNum
+        this.currentMethod = method
       }
 
       if (this.currentMethod === ''){
-        this.currentMethod = 'addition'
-        this.firstNum = parseFloat(this.total)
-      }
-    },
-    subtractNumbers() {
-      this.isActive = 'subtract'
-
-      if (this.equalCount !== 0) {
-        this.equalCount = 0
-        this.currentMethod = ''
-      }
-
-
-      if (this.currentMethod === 'subtraction') {
-        this.firstNum = parseFloat(this.firstNum) - parseFloat(this.total)
-        this.total = this.firstNum
-      }
-
-      if (this.currentMethod === 'addition') {
-        this.currentMethod = 'subtraction'
-        this.firstNum = parseFloat(this.firstNum) + parseFloat(this.total)
-        this.total = this.firstNum
-      }
-
-      if (this.currentMethod === 'multiplication') {
-        this.currentMethod = 'subtraction'
-        this.firstNum = parseFloat(this.firstNum) * parseFloat(this.total)
-        this.total = this.firstNum
-      }
-
-      if (this.currentMethod === 'division') {
-        this.currentMethod = 'subtraction'
-        this.firstNum = parseFloat(this.firstNum) / parseFloat(this.total)
-        this.total = this.firstNum
-      }
-
-      if (this.currentMethod === '') {
-        this.currentMethod = 'subtraction'
-        this.firstNum = parseFloat(this.total)
-      }
-    },
-    multiplyNumbers() {
-      this.isActive = 'multiply'
-
-      if (this.equalCount !== 0) {
-        this.equalCount = 0
-        this.currentMethod = ''
-      }
-
-      if (this.currentMethod === 'multiplication') {
-        this.firstNum = parseFloat(this.firstNum) * parseFloat(this.total)
-        this.total = this.firstNum
-      }
-
-      if (this.currentMethod === 'addition') {
-        this.currentMethod = 'multiplication'
-        this.firstNum = parseFloat(this.firstNum) + parseFloat(this.total)
-        this.total = this.firstNum
-      }
-
-      if (this.currentMethod === 'subtraction') {
-        this.currentMethod = 'multiplication'
-        this.firstNum = parseFloat(this.firstNum) - parseFloat(this.total)
-        this.total = this.firstNum
-      }
-
-      if (this.currentMethod === 'division') {
-        this.currentMethod = 'multiplication'
-        this.firstNum = parseFloat(this.firstNum) / parseFloat(this.total)
-        this.total = this.firstNum
-      }
-
-      if (this.currentMethod === ''){
-        this.currentMethod = 'multiplication'
-        this.firstNum = parseFloat(this.total)
-      }
-    },
-    divideNumbers() {
-      this.isActive = 'divide'
-
-      if (this.equalCount !== 0) {
-        this.equalCount = 0
-        this.currentMethod = ''
-      }
-
-      if (this.currentMethod === 'division') {
-        this.firstNum = parseFloat(this.firstNum) / parseFloat(this.total)
-        this.total = this.firstNum
-      }
-
-      if (this.currentMethod === 'addition') {
-        this.currentMethod = 'division'
-        this.firstNum = parseFloat(this.firstNum) + parseFloat(this.total)
-        this.total = this.firstNum
-      }
-
-      if (this.currentMethod === 'subtraction') {
-        this.currentMethod = 'division'
-        this.firstNum = parseFloat(this.firstNum) - parseFloat(this.total)
-        this.total = this.firstNum
-      }
-
-      if (this.currentMethod === 'multiplication') {
-        this.currentMethod = 'division'
-        this.firstNum = parseFloat(this.firstNum) * parseFloat(this.total)
-        this.total = this.firstNum
-      }
-
-      if (this.currentMethod === ''){
-        this.currentMethod = 'division'
+        this.currentMethod = method
         this.firstNum = parseFloat(this.total)
       }
     }
   },
-
 }
 </script>
